@@ -10,7 +10,7 @@ THB1 potential contains an electrostatic term (Wolf Summation – Wolf et al. 19
 harmonic spring term and a three body term. Analytical expressions from first derivative of aforementioned energy terms
 are as follows,
 
-
+![Equations](showroom/equations.png)
 
 # Algorithm
 ```
@@ -64,6 +64,9 @@ folder in lammps-core_shell directory. To run the example,
 $ cd lammps-core_shell/sample/minimize/
 $ ../.. /src/lmp_serial < initial.in
 ```
+## To cite this work
+
+* S. Mahendran, Ph. Carrez, S. Groh and P. Cordier, Dislocation modelling in Mg2SiO4 forsterite: an atomic scale study based on the THB1 potential, Modelling and Simulation, Materials Science and Engineering 25 (2017), 054002.
 
 ## References
 * Price G D and Parker S C 1987 The Lattice Dynamics of Forsterite Mineralogical Magazine 51 157–170
