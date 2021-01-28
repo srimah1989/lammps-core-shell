@@ -1,0 +1,147 @@
+LAMMPS (5 Sep 2014)
+#########################################################################
+#									#
+#		Conjugate minimization of system			#
+#									#
+#									#
+#########################################################################
+
+# ---------- Initialize Simulation ---------------------
+clear
+units metal
+dimension 3
+boundary p p p
+atom_style charge
+
+atom_modify sort 0 0.0
+
+# ---------- Create Atoms ---------------------
+
+read_data single.lmp
+  orthogonal box = (0 0 0) to (4.78741 10.2717 6.02273)
+  1 by 1 by 1 MPI processor grid
+  reading atoms ...
+  44 atoms
+
+mass 		1 24.305
+mass 		2 28.0855
+mass 		3 15.9994
+mass 		4 1.5994
+
+# ---------- Define Interatomic Potential ---------------------
+
+#pair_style core/shell	Si_tag  3body_const damping_factor cut_off coul_cutoff(optional)
+pair_style core/shell 2 2.09 1.910611932 0.2 2.0000 4.0 -2.0000 0.0 12.0 16.0
+
+#pair_coeff	   Type		A	B	C	kspring	Ks2	cut_sp	cut_3body
+
+pair_coeff	1	4	1428.5	0.2945	0.0	0.0	0.0	0.0	0.0
+pair_coeff	2	4	1283.9	0.3205	10.66	0.0	0.0	0.0	2.0
+pair_coeff	4	4	22764.3	0.1490	27.88	0.0	0.0	0.0	3.0
+pair_coeff	1	2	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	1	1	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	2	2	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	1	3	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	2	3	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	3	3	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	3	4	0.0	1.0	0.0	74.92	0.0	0.6	0.0
+
+#2 is the extra distance between force cutoff,bin scale no.of atoms /processor linearly
+
+neighbor 0.5 multi
+
+neigh_modify once no every 1 delay 0 check yes one 6000
+
+#----------------Define Core and Shell Groups---------------------
+
+group core type 1 2 3
+28 atoms in group core
+
+group shell type 4
+16 atoms in group shell
+
+# ---------------------------- Output settings ---------------------------#
+
+#To compute Energy per atom
+
+compute epa all pe/atom
+
+#To compute stress per atom
+
+compute spa all stress/atom NULL
+
+
+#set the customized output timestep, box length, pressure, hydrostatic pressure, sum of pe/atom for all atom
+
+thermo_style custom step pe press pxx pyy pzz pxy pxz pyz vol lx ly lz
+
+#dump 1 all custom 1000 core_shell.out id type fx fy fz
+
+dump lmpformat all custom 10000 min_disloc.lmp id type q x y z c_epa c_spa[1] c_spa[2] c_spa[3] c_spa[4] c_spa[5] c_spa[6]
+
+dump lmpinput all custom 10000 min.*.lmp id type q x y z
+
+dump_modify lmpinput sort id
+
+#dump cfgformat all cfg 10000 cfg/dump.snap.*.cfg mass type xs ys zs c_epa c_spa[1] c_spa[2] c_spa[3] c_spa[4] c_spa[5] c_spa[6]
+#dump_modify cfgformat element Mg Si O Os
+
+#---------------- Duplicate super cell -----
+
+replicate 2 2 2
+  orthogonal box = (0 0 0) to (9.57482 20.5435 12.0455)
+  1 by 1 by 1 MPI processor grid
+  352 atoms
+
+# --------------- Minimisation -------------
+min_style cg
+
+min_modify line quadratic
+
+thermo 10
+
+#etolereance, ftolerance, maxiteration max number of force/energy evaluation
+
+minimize 0 1e-15 1000000 10000000
+Memory usage per processor = 8.14232 Mbytes
+Step PotEng Press Pxx Pyy Pzz Pxy Pxz Pyz Volume Lx Ly Lz 
+       0   -6666.3896    -140919.1   -72429.196   -200410.95   -149917.16  -0.25137874 -1.7431266e-07 -8.2413858e-08    2369.3408     9.574822    20.543466    12.045452 
+      10   -6796.3924   -18493.985   -26220.802    -10894.67   -18366.484  -0.15763693 5.5081066e-08 -2.4053869e-08    2369.3408     9.574822    20.543466    12.045452 
+      20   -6796.8584   -13730.972    -22751.69    -4762.835   -13678.391    -9.651596 2.1346826e-06 -5.1359094e-07    2369.3408     9.574822    20.543466    12.045452 
+      30   -6796.8666   -12745.142     -21735.5   -3800.9322   -12698.992     -6.53313 5.276411e-07 -1.7305406e-07    2369.3408     9.574822    20.543466    12.045452 
+      40   -6796.8668    -12682.07   -21765.403   -3497.7312   -12783.077  -0.73606077 -2.2068462e-06 -1.3183012e-06    2369.3408     9.574822    20.543466    12.045452 
+      50   -6796.8668   -12650.073   -21734.564    -3494.282   -12721.374   0.17530309 2.8622359e-07 4.0749291e-08    2369.3408     9.574822    20.543466    12.045452 
+      52   -6796.8668   -12649.816   -21734.843   -3492.0792   -12722.526  -0.28495902 -4.8684931e-07 1.9395081e-07    2369.3408     9.574822    20.543466    12.045452 
+Loop time of 9.94436 on 1 procs for 52 steps with 352 atoms
+
+Minimization stats:
+  Stopping criterion = linesearch alpha is zero
+  Energy initial, next-to-last, final = 
+         -6666.3895515     -6796.86684614     -6796.86684614
+  Force two-norm initial, final = 207.674 0.00464973
+  Force max component initial, final = 15.0155 0.000463155
+  Final line search alpha, max atom move = 0.000488281 2.2615e-07
+  Iterations, force evaluations = 52 125
+
+Pair  time (%) = 9.90105 (99.5644)
+Neigh time (%) = 0.026602 (0.267509)
+Comm  time (%) = 0.0107985 (0.108589)
+Outpt time (%) = 0.000188351 (0.00189404)
+Other time (%) = 0.00572467 (0.057567)
+
+Nlocal:    352 ave 352 max 352 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:    14493 ave 14493 max 14493 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:    0 ave 0 max 0 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+FullNghs:  981248 ave 981248 max 981248 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 981248
+Ave neighs/atom = 2787.64
+Neighbor list builds = 1
+Dangerous builds = 0
+
+Please see the log.cite file for references relevant to this simulation
+

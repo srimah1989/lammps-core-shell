@@ -1,0 +1,95 @@
+#########################################################################
+#									#
+#		Conjugate minimization of system			#
+#									#
+#									#
+#########################################################################
+
+# ---------- Initialize Simulation --------------------- 
+clear
+units metal
+dimension 3
+boundary p p p
+atom_style charge
+
+atom_modify sort 0 0.0
+
+# ---------- Create Atoms --------------------- 
+
+read_data single.lmp
+
+mass 		1 24.305
+mass 		2 28.0855
+mass 		3 15.9994
+mass 		4 1.5994
+
+# ---------- Define Interatomic Potential --------------------- 
+
+#pair_style core/shell	Si_tag  3body_const damping_factor cut_off coul_cutoff(optional)   
+pair_style core/shell 2 2.09 1.910611932 0.2 2.0000 4.0 -2.0000 0.0 12.0 16.0  
+
+#pair_coeff	   Type		A	B	C	kspring	Ks2	cut_sp	cut_3body
+
+pair_coeff	1	4	1428.5	0.2945	0.0	0.0	0.0	0.0	0.0
+pair_coeff	2	4	1283.9	0.3205	10.66	0.0	0.0	0.0	2.0
+pair_coeff	4	4	22764.3	0.1490	27.88	0.0	0.0	0.0	3.0	
+pair_coeff	1	2	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	1	1	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	2	2	0.0	1.0	0.0	0.0	0.0	0.0	0.0
+pair_coeff	1	3	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
+pair_coeff	2	3	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
+pair_coeff	3	3	0.0	1.0	0.0	0.0	0.0	0.0	0.0	
+pair_coeff	3	4	0.0	1.0	0.0	74.92	0.0	0.6	0.0 	
+
+#2 is the extra distance between force cutoff,bin scale no.of atoms /processor linearly 
+
+neighbor 0.5 multi
+
+neigh_modify once no every 1 delay 0 check yes one 6000
+
+#----------------Define Core and Shell Groups---------------------
+
+group core type 1 2 3
+
+group shell type 4
+
+# ---------------------------- Output settings ---------------------------#
+
+#To compute Energy per atom
+
+compute epa all pe/atom
+
+#To compute stress per atom
+
+compute spa all stress/atom NULL
+
+
+#set the customized output timestep, box length, pressure, hydrostatic pressure, sum of pe/atom for all atom
+
+thermo_style custom step pe press pxx pyy pzz pxy pxz pyz vol lx ly lz
+
+#dump 1 all custom 1000 core_shell.out id type fx fy fz
+
+dump lmpformat all custom 10000 min_disloc.lmp id type q x y z c_epa c_spa[1] c_spa[2] c_spa[3] c_spa[4] c_spa[5] c_spa[6] 
+
+dump lmpinput all custom 10000 min.*.lmp id type q x y z
+
+dump_modify lmpinput sort id 
+
+#dump cfgformat all cfg 10000 cfg/dump.snap.*.cfg mass type xs ys zs c_epa c_spa[1] c_spa[2] c_spa[3] c_spa[4] c_spa[5] c_spa[6] 
+#dump_modify cfgformat element Mg Si O Os
+
+#---------------- Duplicate super cell -----
+
+replicate 2 2 2 
+
+# --------------- Minimisation -------------
+min_style cg
+
+min_modify line quadratic
+
+thermo 10
+
+#etolereance, ftolerance, maxiteration max number of force/energy evaluation
+
+minimize 0 1e-15 1000000 10000000
