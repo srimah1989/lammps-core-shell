@@ -65,7 +65,7 @@ $ cd lammps-core_shell/sample/minimize/
 $ ../.. /src/lmp_serial < initial.in
 ```
 #### Note: 
-This code is developed on the August 2017 release of LAMMPS. The files in **pairstyle-core-shell** in this repo can be copied to the similar version or earlier version of LAMMPS and can be complied in serial or parallel in a cluster. 
+This code is developed on the August 2017 release of LAMMPS. If you wish to use this pair style to your own LAMMPS compilation. The files in **pairstyle-core-shell** in this repo can be copied to **src** folder of to the similar version or earlier versions of LAMMPS and can be complied in serial or parallel in a cluster. 
 
 ## To cite this work
 
