@@ -64,6 +64,9 @@ folder in lammps-core_shell directory. To run the example,
 $ cd lammps-core_shell/sample/minimize/
 $ ../.. /src/lmp_serial < initial.in
 ```
+#### Note: 
+This code is developed on the August 2017 release of LAMMPS. The files in **pairstyle-core-shell** in this repo can be copied to the similar version or earlier version of LAMMPS and can be complied in serial or parallel in a cluster. 
+
 ## To cite this work
 
 * S. Mahendran, Ph. Carrez, S. Groh and P. Cordier, Dislocation modelling in Mg2SiO4 forsterite: an atomic scale study based on the THB1 potential, Modelling and Simulation, Materials Science and Engineering 25 (2017), 054002.
