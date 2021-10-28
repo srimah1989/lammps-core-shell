@@ -67,6 +67,8 @@ $ ../.. /src/lmp_serial < initial.in
 ## To cite this work
 
 * S. Mahendran, Ph. Carrez, S. Groh and P. Cordier, Dislocation modelling in Mg2SiO4 forsterite: an atomic scale study based on the THB1 potential, Modelling and Simulation, Materials Science and Engineering 25 (2017), 054002.
+* S. Mahendran, Ph. Carrez, P. Cordier, On the glide of [100] dislocation and the origin of ‘pencil glide’ in Mg2SiO4 olivine, Philosophical Magazine (2010).
+* S. Mahendran, Ph. Carrez, P. Cordier, The core structure of screw dislocations with [001] Burgers vector in Mg2SiO4 olivine, Comptes Rendus. Physique (2021).
 
 ## References
 * Price G D and Parker S C 1987 The Lattice Dynamics of Forsterite Mineralogical Magazine 51 157–170
